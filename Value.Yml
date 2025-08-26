@@ -1,0 +1,107 @@
+global:
+  multitenancy:
+    enabled: true
+
+identity:
+  auth:
+    publicIssuerUrl: "http://keycloak.camunda.test/auth/realms/camunda-platform"
+    operate:
+      redirectUrl: "http://operate.camunda.test"
+    tasklist:
+      redirectUrl: "http://tasklist.camunda.test"
+    optimize:
+      redirectUrl: "http://optimize.camunda.test"
+    # NEW: tell Identity where to find Keycloak’s token endpoint
+    keycloakIssuerUrl: "http://keycloak.camunda.test/auth/realms/camunda-platform"
+
+  ingress:
+    enabled: true
+    className: nginx
+    host: "identity.camunda.test"
+    tls:
+      enabled: false
+
+keycloak:
+  enabled: true
+  url: "http://keycloak.camunda.test/auth"
+  ingress:
+    enabled: true
+    className: nginx
+    hostname: "keycloak.camunda.test"
+
+  # NEW: extra clients needed for multi-tenancy
+  extraClients:
+    - clientId: operate
+      secret: operate-secret
+      rootUrl: "http://operate.camunda.test"
+      redirectUris:
+        - "http://operate.camunda.test/*"
+      webOrigins:
+        - "*"
+    - clientId: tasklist
+      secret: tasklist-secret
+      rootUrl: "http://tasklist.camunda.test"
+      redirectUris:
+        - "http://tasklist.camunda.test/*"
+      webOrigins:
+        - "*"
+    - clientId: optimize
+      secret: optimize-secret
+      rootUrl: "http://optimize.camunda.test"
+      redirectUris:
+        - "http://optimize.camunda.test/*"
+      webOrigins:
+        - "*"
+    - clientId: identity
+      secret: identity-secret
+      rootUrl: "http://identity.camunda.test"
+      redirectUris:
+        - "http://identity.camunda.test/*"
+      webOrigins:
+        - "*"
+
+operate:
+  ingress:
+    enabled: true
+    className: nginx
+    host: "operate.camunda.test"
+
+optimize:
+  ingress:
+    enabled: true
+    className: nginx
+    host: "optimize.camunda.test"
+
+tasklist:
+  ingress:
+    enabled: true
+    className: nginx
+    host: "tasklist.camunda.test"
+
+zeebe:
+  clusterSize: 1
+  partitionCount: 1
+  replicationFactor: 1
+  pvcSize: 10Gi
+  zeebeGateway:
+    replicas: 1
+    ingress:
+      enabled: true
+      className: nginx
+      host: "zeebe.camunda.test"
+
+elasticsearch:
+  master:
+    replicaCount: 1
+    persistence:
+      size: 10Gi
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+identityPostgresql:
+  enabled: true
